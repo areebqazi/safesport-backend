@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 // import userRouter from "./routes/userRouter.js";
 import authRouter from "./routes/authRouter.js";
+import userRouter from "./routes/userRouter.js";
 import cors from 'cors'
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.listen(8080, () => {
   console.log("Server is running on port 8080");
 });
 
-// app.use("/api/user", userRouter);
+app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+
 

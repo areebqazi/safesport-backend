@@ -4,11 +4,9 @@ import bcryptjs from "bcryptjs";
 import errorHandler from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
-const app = express();
+const router = express.Router();
 
-app.use(express.json());
-
-app.post('/signup', async (req, res, next) => {
+router.post('/signup', async (req, res, next) => {
   const { name, email, password } = req.body;
   if (!password)
     return next({
@@ -25,7 +23,7 @@ app.post('/signup', async (req, res, next) => {
   }
 });
 
-app.post('/signin', async (req, res, next) => {
+router.post('/signin', async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const validUser = await User.findOne({ email });
@@ -44,7 +42,7 @@ app.post('/signin', async (req, res, next) => {
   }
 });
 
-app.post('/google', async (req, res, next) => {
+router.post('/google', async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
@@ -78,7 +76,7 @@ app.post('/google', async (req, res, next) => {
   }
 });
 
-app.post('/signout', async (req, res, next) => {
+router.post('/signout', async (req, res, next) => {
   try {
     res.clearCookie("access_token");
     res.status(200).json("Signout successfully...");
@@ -86,4 +84,4 @@ app.post('/signout', async (req, res, next) => {
 });
 
 
-export default app;
+export default router;

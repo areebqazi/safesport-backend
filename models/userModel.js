@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+const videoStatusSchema = new mongoose.Schema({
+  unlocked: { type: Boolean, default: false },
+  watched: { type: Boolean, default: false }
+});
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -21,14 +26,16 @@ const userSchema = new mongoose.Schema(
     },
     isAdmin: {
       type: Boolean,
-      default : false
+      default: false,
     },
-    videoStatus: [
-        {
-            unlocked: { type: Boolean, default: false },
-            watched: { type: Boolean, default: false }
-        }
-    ]
+    videoStatus: {
+      type: [videoStatusSchema],
+      default: () => {
+        const statuses = Array(8).fill({ unlocked: false, watched: false });
+        statuses[0] = { unlocked: true, watched: false };
+        return statuses;
+      },
+    },
   },
   { timestamps: true }
 );
