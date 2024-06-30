@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    sport:{
+      type : String
+    },
     videoStatus: {
       type: [videoStatusSchema],
       default: () => {

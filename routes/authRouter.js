@@ -32,11 +32,42 @@ router.post('/signin', async (req, res, next) => {
     if (!validPassword)
       return next(errorHandler(401, "Invalid email or password"));
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
-    const { password: userPassword, ...user } = validUser._doc;
-    res
-      .cookie("access_token", token, { httpOnly: true })
-      .json(user)
-      .status(200);
+    const { password: userPassword, ...userWithoutPassword } = validUser._doc;
+
+    // Include the token in the user object in the response
+    res.status(200).json({
+      user: {
+        ...userWithoutPassword,
+        token: token // Include the token here
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/admin/signin', async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const adminUser = await User.findOne({ email });
+    if (!adminUser) return next(errorHandler(401, "Invalid email or password"));
+
+    // Check if the user is an admin (assuming there's an isAdmin field in your User schema)
+    if (!adminUser.isAdmin) return next(errorHandler(403, "Unauthorized access"));
+
+    const validPassword = bcryptjs.compareSync(password, adminUser.password);
+    if (!validPassword) return next(errorHandler(401, "Invalid email or password"));
+
+    const token = jwt.sign({ id: adminUser._id }, process.env.JWT_SECRET);
+    const { password: userPassword, ...userWithoutPassword } = adminUser._doc;
+
+    // Include the token in the user object in the response
+    res.status(200).json({
+      user: {
+        ...userWithoutPassword,
+        token: token // Include the token here
+      }
+    });
   } catch (error) {
     next(error);
   }

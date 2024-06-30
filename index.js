@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 // import userRouter from "./routes/userRouter.js";
 import authRouter from "./routes/authRouter.js";
 import userRouter from "./routes/userRouter.js";
+import videoRouter from "./routes/videoRouter.js";
 import cors from 'cors'
 dotenv.config();
 
@@ -25,5 +26,7 @@ app.listen(8080, () => {
 
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/videos", videoRouter);
+
 
 
