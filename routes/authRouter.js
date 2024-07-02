@@ -7,14 +7,14 @@ import jwt from "jsonwebtoken";
 const router = express.Router();
 
 router.post('/signup', async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, birthdate,sport } = req.body;
   if (!password)
     return next({
       statusCode: 400,
       message: "Password must be at least 6 characters long",
     });
   const hashedPassword = bcryptjs.hashSync(password, 10);
-  const newUser = new User({ name, email, password: hashedPassword });
+  const newUser = new User({ name, email, password: hashedPassword, birthdate,sport});
   try {
     await newUser.save();
     res.status(201).json({ message: "User created successfully" });

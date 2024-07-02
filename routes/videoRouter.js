@@ -11,6 +11,10 @@ const router = express.Router();
 router.use(fileUpload());
 // Create a new video
 router.post('/', verifyToken, async (req, res) => {
+  const allVideos = (await Video.find()).length;
+  if (allVideos >= 10) {
+    return res.status(400).send({ error: 'You can only have 10 videos' });
+  }
   const video = new Video(req.body);
   try {
     await video.save();
@@ -22,7 +26,7 @@ router.post('/', verifyToken, async (req, res) => {
 );
 
 // Get all videos
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const videos = await Video.find();
     res.status(200).send(videos);
@@ -70,18 +74,18 @@ router.patch('/:id', verifyToken, async (req, res) => {
 });
 
 // Delete a video by ID
-router.delete('/:id', verifyToken, async (req, res) => {
-  try {
-    const video = await Video.findByIdAndDelete(req.params.id);
+// router.delete('/:id', verifyToken, async (req, res) => {
+//   try {
+//     const video = await Video.findByIdAndDelete(req.params.id);
 
-    if (!video) {
-      return res.status(404).send();
-    }
+//     if (!video) {
+//       return res.status(404).send();
+//     }
 
-    res.status(200).send(video);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+//     res.status(200).send(video);
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// });
 
 export default router;
