@@ -6,11 +6,12 @@ import authRouter from "./routes/authRouter.js";
 import userRouter from "./routes/userRouter.js";
 import videoRouter from "./routes/videoRouter.js";
 import cors from 'cors'
+import bodyParser from 'body-parser'
 dotenv.config();
 
 const app = express();
 app.use(cors())
-app.use(express.json());
+app.use(bodyParser.json({ limit: '5mb' }));
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {

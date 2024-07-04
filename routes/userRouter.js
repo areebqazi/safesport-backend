@@ -1,3 +1,5 @@
+import transporter from '../mailer.js';
+import path from 'path';
 import express from 'express';
 import User from '../models/userModel.js';
 import verifyToken from '../utils/verifyToken.js';
@@ -53,7 +55,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 // Delete a user by ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',verifyToken, async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
@@ -64,5 +66,34 @@ router.delete('/:id', async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
+router.post('/send-certificate', async (req, res) => {
+  const { email, certificateBase64 } = req.body;
+
+  const mailOptions = {
+    from: 'your-email@gmail.com',
+    to: email,
+    subject: 'Your Certificate',
+    html: `<p>Attached is your certificate.</p>`,
+    attachments: [
+      {
+        filename: 'certificate.png',
+        content: certificateBase64.split("base64,")[1],
+        encoding: 'base64',
+      },
+    ],
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+      return res.status(500).json({ message: 'Failed to send email', error });
+    }
+    res.status(200).json({ message: 'Email sent successfully', info });
+  });
+});
+
+
 
 export default router;
