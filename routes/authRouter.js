@@ -1,20 +1,27 @@
-import express from 'express';
+import express from "express";
 import User from "../models/userModel.js";
 import bcryptjs from "bcryptjs";
 import errorHandler from "../utils/error.js";
 import jwt from "jsonwebtoken";
+import transporter from "../mailer.js";
 
 const router = express.Router();
 
-router.post('/signup', async (req, res, next) => {
-  const { name, email, password, birthdate,sport } = req.body;
+router.post("/signup", async (req, res, next) => {
+  const { name, email, password, birthdate, sport } = req.body;
   if (!password)
     return next({
       statusCode: 400,
       message: "Password must be at least 6 characters long",
     });
   const hashedPassword = bcryptjs.hashSync(password, 10);
-  const newUser = new User({ name, email, password: hashedPassword, birthdate,sport});
+  const newUser = new User({
+    name,
+    email,
+    password: hashedPassword,
+    birthdate,
+    sport,
+  });
   try {
     await newUser.save();
     res.status(201).json({ message: "User created successfully" });
@@ -23,7 +30,7 @@ router.post('/signup', async (req, res, next) => {
   }
 });
 
-router.post('/signin', async (req, res, next) => {
+router.post("/signin", async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const validUser = await User.findOne({ email });
@@ -38,25 +45,27 @@ router.post('/signin', async (req, res, next) => {
     res.status(200).json({
       user: {
         ...userWithoutPassword,
-        token: token // Include the token here
-      }
+        token: token, // Include the token here
+      },
     });
   } catch (error) {
     next(error);
   }
 });
 
-router.post('/admin/signin', async (req, res, next) => {
+router.post("/admin/signin", async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const adminUser = await User.findOne({ email });
     if (!adminUser) return next(errorHandler(401, "Invalid email or password"));
 
     // Check if the user is an admin (assuming there's an isAdmin field in your User schema)
-    if (!adminUser.isAdmin) return next(errorHandler(403, "Unauthorized access"));
+    if (!adminUser.isAdmin)
+      return next(errorHandler(403, "Unauthorized access"));
 
     const validPassword = bcryptjs.compareSync(password, adminUser.password);
-    if (!validPassword) return next(errorHandler(401, "Invalid email or password"));
+    if (!validPassword)
+      return next(errorHandler(401, "Invalid email or password"));
 
     const token = jwt.sign({ id: adminUser._id }, process.env.JWT_SECRET);
     const { password: userPassword, ...userWithoutPassword } = adminUser._doc;
@@ -65,54 +74,70 @@ router.post('/admin/signin', async (req, res, next) => {
     res.status(200).json({
       user: {
         ...userWithoutPassword,
-        token: token // Include the token here
-      }
+        token: token, // Include the token here
+      },
     });
   } catch (error) {
     next(error);
   }
 });
 
-router.post('/google', async (req, res, next) => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-      const { password: userPassword, ...userData } = user._doc;
-      res
-        .cookie("access_token", token, { httpOnly: true })
-        .json(userData)
-        .status(200);
-    } else {
-      const generatedPassword = Math.random().toString(36).slice(-8);
-      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
-      const newUser = new User({
-        username:
-          req.body.displayName.split(" ").join("").toLowerCase() +
-          Math.random().toString(36).slice(-8),
-        email: req.body.email,
-        password: hashedPassword,
-        avatar: req.body.photoURL,
-      });
-      await newUser.save();
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
-      const { password: userPassword, ...userData } = newUser._doc;
-      res
-        .cookie("access_token", token, { httpOnly: true })
-        .json(userData)
-        .status(200);
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.post('/signout', async (req, res, next) => {
+router.post("/signout", async (req, res, next) => {
   try {
     res.clearCookie("access_token");
     res.status(200).json("Signout successfully...");
   } catch (error) {}
 });
 
+router.post("/sendOTP", async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+    }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpirationTime = new Date(Date.now() + 600000); // 10 minutes
+    await user.save();
+    const mailOptions = {
+      from: "your-email@gmail.com",
+      to: email,
+      subject: "OTP for password reset",
+      text: `Your OTP for password reset is ${otp}`,
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: "Failed to send email", error });
+      }
+      res.status(200).json({ message: "Email sent successfully", info });
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/reset-password", async (req, res, next) => {
+  const { email, otp, newPassword } = req.body;
+  try {
+    const user = await User.findOne({
+      email,
+    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+    if (user.otpExpirationTime < new Date()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+    user.password = bcryptjs.hashSync(newPassword, 10);
+    await user.save();
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;

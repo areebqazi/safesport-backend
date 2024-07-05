@@ -39,6 +39,12 @@ const userSchema = new mongoose.Schema(
         return statuses;
       },
     },
+    otp: {
+      type: String,
+    },
+    otpExpirationTime: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );
