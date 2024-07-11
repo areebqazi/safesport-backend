@@ -16,18 +16,27 @@ const oAuth2Client = new google.auth.OAuth2(
   REDIRECT_URI
 );
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-const accessToken = await oAuth2Client.getAccessToken();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    type: "OAuth2",
-    user: "areebqqzi@gmail.com",
-    clientId: CLIENT_ID,
-    clientSecret: CLEINT_SECRET,
-    refreshToken: REFRESH_TOKEN,
-    accessToken: accessToken,
-  },
-});
+async function createTransporter() {
+  try {
+    const accessToken = await oAuth2Client.getAccessToken();
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: "areebqqzi@gmail.com",
+        clientId: CLIENT_ID,
+        clientSecret: CLEINT_SECRET,
+        refreshToken: REFRESH_TOKEN,
+        accessToken: accessToken.token,
+      },
+    });
+    console.log("Transporter created");
+    return transporter;
+  } catch (error) {
+    console.error("Failed to create transporter:", error);
+    throw new Error("Failed to create transporter");
+  }
+}
 
-export default transporter;
+export default createTransporter;
