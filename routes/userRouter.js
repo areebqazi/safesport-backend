@@ -73,7 +73,15 @@ router.delete("/:id", verifyToken, async (req, res) => {
 router.post("/send-certificate", async (req, res) => {
   try {
     const { email, certificateBase64 } = req.body;
-
+    // update user schema with the certificate url
+    const user = await User.findOneAndUpdate(
+      { email },
+      { certificateDataUrl: certificateBase64 },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }      
     const mailOptions = {
       from: "your-email@gmail.com",
       to: email,

@@ -7,10 +7,13 @@ const videoStatusSchema = new mongoose.Schema({
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: "Name is required",
-      unique: true,
+    firstName : {
+      type : String,
+      required : "First Name is required"
+    },
+    lastName : {
+      type : String,
+      required : "Last Name is required"
     },
     email: {
       type: String,
@@ -31,6 +34,11 @@ const userSchema = new mongoose.Schema(
     sport:{
       type : String
     },
+    certificateDataUrl: {
+      type : String,
+      default : ""
+    },
+  
     videoStatus: {
       type: [videoStatusSchema],
       default: () => {
