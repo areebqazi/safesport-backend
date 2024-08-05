@@ -42,13 +42,13 @@ const userSchema = new mongoose.Schema(
     videoStatus: {
       type: [videoStatusSchema],
       default: () => {
-        const statuses = Array(10).fill({ unlocked: false, watched: false });
+        const statuses = Array(8).fill({ unlocked: false, watched: false });
         statuses[0] = { unlocked: true, watched: false };
         return statuses;
       },
     },
     otp: {
-      type: String,
+      type: String, 
     },
     otpExpirationTime: {
       type: Date,

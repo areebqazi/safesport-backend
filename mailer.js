@@ -19,8 +19,9 @@ oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
 async function createTransporter() {
   try {
-    const accessToken = await oAuth2Client.getAccessToken();
-    
+    // const accessToken = await oAuth2Client.getAccessToken();
+    const accessToken = 'ya29.a0AXooCgvFvr5Bj-Enxgm7-A_66NS_cczhstdrj2TLRjPeTBNcJQHwE7IPxu3yL66MzBKt4g_jctfLJ7R_aBCvDxCr3pLDOgwo0rhQWA8I9dU6eTSos1VR6tWvn6wOOHYGl0pxz7cC_K634YwCq6IV3eCwiFcnHMkBQInxaCgYKAVMSARESFQHGX2MiDj6Bkx494CN6emdyu2RgvQ0171'
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {

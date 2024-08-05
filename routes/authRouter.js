@@ -3,12 +3,12 @@ import User from "../models/userModel.js";
 import bcryptjs from "bcryptjs";
 import errorHandler from "../utils/error.js";
 import jwt from "jsonwebtoken";
-import transporter from "../mailer.js";
+import createTransporter from "../mailer1.js";
 
 const router = express.Router();
 
 router.post("/signup", async (req, res, next) => {
-  const { name, email, password, birthdate, sport } = req.body;
+  const { firstName,lastName, email, password, birthdate, sport } = req.body;
   if (!password)
     return next({
       statusCode: 400,
@@ -16,7 +16,8 @@ router.post("/signup", async (req, res, next) => {
     });
   const hashedPassword = bcryptjs.hashSync(password, 10);
   const newUser = new User({
-    name,
+    firstName,
+    lastName,
     email,
     password: hashedPassword,
     birthdate,
@@ -94,25 +95,31 @@ router.post("/sendOTP", async (req, res, next) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.otp = otp;
     user.otpExpirationTime = new Date(Date.now() + 600000); // 10 minutes
     await user.save();
+
     const mailOptions = {
-      from: "your-email@gmail.com",
+      from: process.env.GODADDY_EMAIL, // Sender address
       to: email,
       subject: "OTP for password reset",
       text: `Your OTP for password reset is ${otp}`,
     };
+
+    const transporter = await createTransporter();
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
+        console.log(error);
         return res.status(500).json({ message: "Failed to send email", error });
       }
       res.status(200).json({ message: "Email sent successfully", info });
     });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });

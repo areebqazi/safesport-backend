@@ -1,4 +1,5 @@
-import createTransporter from "../mailer.js";
+// import createTransporter from "../mailer.js";
+import createTransporter from "../mailer1.js"
 import path from "path";
 import express from "express";
 import User from "../models/userModel.js";
@@ -73,7 +74,8 @@ router.delete("/:id", verifyToken, async (req, res) => {
 router.post("/send-certificate", async (req, res) => {
   try {
     const { email, certificateBase64 } = req.body;
-    // update user schema with the certificate url
+    console.log("go daddy mail", process.env.GODADDY_EMAIL);
+    // Update user schema with the certificate URL
     const user = await User.findOneAndUpdate(
       { email },
       { certificateDataUrl: certificateBase64 },
@@ -81,9 +83,11 @@ router.post("/send-certificate", async (req, res) => {
     );
     if (!user) {
       return res.status(404).json({ message: "User not found" });
-    }      
+    }
+
+    // Create mail options
     const mailOptions = {
-      from: "your-email@gmail.com",
+      from: process.env.GODADDY_EMAIL, // Sender address
       to: email,
       subject: "Your Certificate",
       html: `<p>Attached is your certificate.</p>`,
@@ -95,6 +99,8 @@ router.post("/send-certificate", async (req, res) => {
         },
       ],
     };
+
+    // Create transporter and send email
     const transporter = await createTransporter();
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
