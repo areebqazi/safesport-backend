@@ -38,7 +38,10 @@ const userSchema = new mongoose.Schema(
       type : String,
       default : ""
     },
-  
+    courseCompletionDate: {
+      type : Date,
+      default : null
+    },
     videoStatus: {
       type: [videoStatusSchema],
       default: () => {
