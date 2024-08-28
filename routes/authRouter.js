@@ -3,7 +3,9 @@ import User from "../models/userModel.js";
 import bcryptjs from "bcryptjs";
 import errorHandler from "../utils/error.js";
 import jwt from "jsonwebtoken";
-import createTransporter from "../mailer1.js";
+// import createTransporter from "../mailer1.js";
+import createTransporter from "../mailer.js";
+
 
 const router = express.Router();
 
@@ -104,7 +106,7 @@ router.post("/sendOTP", async (req, res, next) => {
     await user.save();
 
     const mailOptions = {
-      from: process.env.GODADDY_EMAIL, // Sender address
+      from: "hello@safesportforyouth.org", // Sender address
       to: email,
       subject: "OTP for password reset",
       text: `Your OTP for password reset is ${otp}`,
