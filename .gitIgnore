@@ -11,6 +11,7 @@
 /bin/
 /build/
 /dist/
+.env
 
 # Ignore package manager directories
 /node_modules/
