@@ -98,7 +98,7 @@ router.post("/send-certificate", async (req, res) => {
         
         <p>------------------------------------------------</p> <br /><br /><br />
         
-        <p><b>Merci!</b></p>
+        <img src="https://www.safesportforyouth.org/static/media/safesportlogoFrench.72e91f10a9372110abe0.png"><br /><br /><p><b>Merci!</b></p>
         <p>Merci d'avoir suivi le programme de formation au sport sécuritaire pour les jeunes !</p>
         <p>Vous trouverez ci-joint votre certificat de réussite que vous pourrez présenter à votre club ou à votre organisme provincial de sport comme preuve de réussite, le cas échéant. Vous pouvez également vous connecter à votre compte sur <a href="https://safesportforyouth.org">safesportforyouth.org</a> pour télécharger votre certificat.</p>
         <p>D'autres ressources sur le sport sécuritaire sont disponibles à <a href="https://www.safesportforyouth.org/Resources">cette page</a>. Les vidéos demeurent en ligne et vous pouvez les visionner à tout moment en vous connectant à votre compte.</p>
