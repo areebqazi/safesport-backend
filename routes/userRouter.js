@@ -96,7 +96,7 @@ router.post("/send-certificate", async (req, res) => {
         <p>Additional Safe Sport resources are available at <a href="https://www.safesportforyouth.org/Resources">this link</a> and the videos will remain online for you to re-watch at any time by logging into your account.</p>
         <p>If you have any questions about the program please visit our Frequently Asked Questions page or contact us at <a href="mailto:hello@safesportforyouth.org">hello@safesportforyouth.org</a>.</p> <br /> <br /> <br />
         
-        <p>------------------------------------------------</p> <br /><br /><br />
+        <p>-------------------------------------------------</p> <br /><br /><br /> 
         
         <img src="https://www.safesportforyouth.org/static/media/safesportlogoFrench.72e91f10a9372110abe0.png"><br /><br /><p><b>Merci!</b></p>
         <p>Merci d'avoir suivi le programme de formation au sport sécuritaire pour les jeunes !</p>
